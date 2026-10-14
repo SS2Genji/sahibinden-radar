@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local SQLite databases (holds user scan history)
+*.db
+radar.db
+
+# User private configuration (telegram tokens, custom filters)
+config.json
+
+# Temporary Chrome browser data directory
+.chrome-profile/
+/tmp/radar-chrome/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db

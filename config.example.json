@@ -1,0 +1,19 @@
+{
+  "cdp_port": 9222,
+  "active_presets": [
+    "smartphones",
+    "gaming",
+    "laptops",
+    "premium_home"
+  ],
+  "min_profit_tl": 3000,
+  "min_discount_pct": 12.0,
+  "target_cities": [],
+  "scan_interval_min_sec": 45,
+  "scan_interval_max_sec": 75,
+  "telegram": {
+    "enabled": false,
+    "bot_token": "YOUR_TELEGRAM_BOT_TOKEN_HERE",
+    "chat_id": "YOUR_TELEGRAM_CHAT_ID_HERE"
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "smartphones": {
+    "name": "Apple & Premium Akıllı Telefonlar",
+    "description": "iPhone 13, 14, 15, 16 serisi ve popüler amiral gemileri",
+    "targets": [
+      {
+        "name": "Apple iPhone 15 Pro",
+        "url": "https://www.sahibinden.com/cep-telefonu-aksesuar?query_text_mf=iphone+15+pro&query_text=iphone+15+pro&sorting=date_desc",
+        "min_price": 20000,
+        "max_price": 85000,
+        "category": "iphone_15_pro"
+      },
+      {
+        "name": "Apple iPhone 14 Pro",
+        "url": "https://www.sahibinden.com/cep-telefonu-aksesuar?query_text_mf=iphone+14+pro&query_text=iphone+14+pro&sorting=date_desc",
+        "min_price": 18000,
+        "max_price": 65000,
+        "category": "iphone_14_pro"
+      },
+      {
+        "name": "Apple iPhone 13",
+        "url": "https://www.sahibinden.com/cep-telefonu-aksesuar?query_text_mf=iphone+13&query_text=iphone+13&sorting=date_desc",
+        "min_price": 15000,
+        "max_price": 42000,
+        "category": "iphone_13"
+      }
+    ],
+    "negative_keywords": [
+      "yd",
+      "y.d",
+      "yurtdışı",
+      "yurt dışı",
+      "server kayıtlı",
+      "arızalı",
+      "ekran kırık",
+      "tamirli",
+      "anakart arızalı",
+      "parça niyetine",
+      "kiralık",
+      "takas",
+      "takaslı",
+      "takaslık",
+      "takas olur",
+      "kasa ezik"
+    ]
+  },
+  "gaming": {
+    "name": "Oyun Konsolları & Ekipman",
+    "description": "PlayStation 5, Xbox Series X ve popüler oyuncu donanımları",
+    "targets": [
+      {
+        "name": "Sony PlayStation 5",
+        "url": "https://www.sahibinden.com/oyun-konsolu?query_text_mf=playstation+5&query_text=playstation+5&sorting=date_desc",
+        "min_price": 10000,
+        "max_price": 32000,
+        "category": "ps5"
+      }
+    ],
+    "negative_keywords": [
+      "kiralık",
+      "hesap",
+      "hesabı",
+      "kol arızalı",
+      "tamirli",
+      "banlı",
+      "psn ban",
+      "takas",
+      "takaslı",
+      "sadece oyun",
+      "çanta",
+      "kutusu boş"
+    ]
+  },
+  "laptops": {
+    "name": "Apple MacBook & Premium Laptoplar",
+    "description": "MacBook Air & Pro M1, M2, M3 modelleri",
+    "targets": [
+      {
+        "name": "Apple MacBook Silicon (M1/M2/M3)",
+        "url": "https://www.sahibinden.com/apple-macbook-laptop?sorting=date_desc",
+        "min_price": 15000,
+        "max_price": 95000,
+        "category": "macbook_silicon"
+      }
+    ],
+    "negative_keywords": [
+      "icloud kilitli",
+      "mdm",
+      "bypass",
+      "anakart arızalı",
+      "sıvı temas",
+      "kasa ezik",
+      "ekran kırık",
+      "yedek parça",
+      "parça niyetine",
+      "takas",
+      "kiralık"
+    ]
+  },
+  "premium_home": {
+    "name": "Dyson & Küçük Ev Teknolojisi",
+    "description": "Dyson Süpürgeler (V12, V15) ve Airwrap saç şekillendiriciler",
+    "targets": [
+      {
+        "name": "Dyson V12 / V15 / Airwrap",
+        "url": "https://www.sahibinden.com/elektrikli-supurge?query_text_mf=dyson&query_text=dyson&price_min=8000&sorting=date_desc",
+        "min_price": 8000,
+        "max_price": 38000,
+        "category": "dyson_tech"
+      }
+    ],
+    "negative_keywords": [
+      "arızalı",
+      "motor arızalı",
+      "bataryası bitik",
+      "orijinal değil",
+      "replika",
+      "kiralık",
+      "takas",
+      "sadece başlık",
+      "filtre",
+      "yedek parça"
+    ]
+  }
+}

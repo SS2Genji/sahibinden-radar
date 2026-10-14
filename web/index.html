@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sahibinden Arbitraj & Fırsat Radarı</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            dark: {
+              bg: '#090d16',
+              surface: '#111827',
+              border: '#1f2937',
+              muted: '#374151'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      /* Emil Kowalski custom easing curves */
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #080c14;
+      color: #f3f4f6;
+    }
+
+    /* Impeccable Browser Surfaces Theming */
+    ::selection {
+      background: rgba(99, 102, 241, 0.35);
+      color: #ffffff;
+    }
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Emil Kowalski Tactile Button Feedback */
+    .btn-tactile {
+      transition: transform 160ms var(--ease-out), background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+      will-change: transform;
+    }
+    .btn-tactile:active {
+      transform: scale(0.97) !important;
+    }
+
+    /* Impeccable Layered Depth & Glassmorphism */
+    .glass-card {
+      background: rgba(13, 18, 30, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 8px 30px -4px rgba(0, 0, 0, 0.45);
+      transition: transform 200ms var(--ease-out), border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 12px 35px -4px rgba(0, 0, 0, 0.5), 0 0 20px -4px rgba(99, 102, 241, 0.15);
+    }
+
+    .glow-green {
+      box-shadow: 0 0 20px -4px rgba(16, 185, 129, 0.35);
+    }
+    .glow-amber {
+      box-shadow: 0 0 20px -4px rgba(245, 158, 11, 0.35);
+    }
+
+    /* Custom Form Focus Rings */
+    input:focus-visible, select:focus-visible {
+      outline: none;
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25) !important;
+    }
+
+    /* Emil Kowalski Natural Modal Transition (Never scale(0)) */
+    .modal-overlay {
+      transition: opacity 200ms var(--ease-out);
+    }
+    .modal-box {
+      transition: transform 220ms var(--ease-drawer), opacity 220ms var(--ease-drawer);
+      transform: scale(1);
+      opacity: 1;
+    }
+    .modal-animating.modal-overlay {
+      opacity: 0;
+    }
+    .modal-animating .modal-box {
+      transform: scale(0.96) !important;
+      opacity: 0 !important;
+    }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1f293d;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col custom-scrollbar">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 glass-card border-b border-gray-800/80 px-6 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">ARBITRAGE RADAR</h1>
+            <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Argon v2.1</span>
+          </div>
+          <p class="text-xs text-gray-400">Sahibinden Yerel Arbitraj & Kelepir İlan Motoru</p>
+        </div>
+      </div>
+
+      <!-- STATUS & ACTIONS -->
+      <div class="flex items-center gap-3">
+        <!-- Live Monitoring Badge -->
+        <div id="daemon-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800/80 border border-gray-700/60 text-xs font-medium text-gray-400">
+          <span class="w-2 h-2 rounded-full bg-gray-500"></span>
+          <span id="daemon-text">Beklemede</span>
+        </div>
+
+        <!-- Scan Now Button -->
+        <button id="btn-scan" onclick="triggerScan()" class="btn-tactile flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs sm:text-sm shadow-lg shadow-indigo-600/30">
+          <svg id="scan-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span id="scan-btn-text">Hemen Tara</span>
+        </button>
+
+        <!-- Pro Targets Button -->
+        <button id="btn-targets" onclick="toggleCustomTargetsModal()" class="btn-tactile flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium text-xs sm:text-sm shadow-lg shadow-emerald-600/20">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>🎯 Pro Takip</span>
+          <span id="nav-target-count" class="ml-0.5 px-1.5 py-0.2 rounded-full bg-black/30 text-[10px] font-bold tabular-nums">0</span>
+        </button>
+
+        <!-- Toggle Daemon -->
+        <button id="btn-daemon" onclick="toggleDaemon()" class="btn-tactile flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 font-medium text-xs sm:text-sm">
+          <span id="daemon-btn-text">Otomatik İzle</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button onclick="toggleSettingsModal()" class="btn-tactile p-2 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- KPI STATS CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-gray-400">
+          <span class="text-xs font-semibold uppercase tracking-wider">Taranan İlanlar</span>
+          <span class="p-2 rounded-lg bg-gray-800 text-gray-300">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </span>
+        </div>
+        <div class="mt-3">
+          <div id="stat-total-listings" class="text-2xl sm:text-3xl font-extrabold text-white tabular-nums">0</div>
+          <p id="stat-last-scan" class="text-xs text-gray-400 mt-1">Son Güncelleme: -</p>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-gray-400">
+          <span class="text-xs font-semibold uppercase tracking-wider">Kelepir Fırsatlar</span>
+          <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+        </div>
+        <div class="mt-3">
+          <div id="stat-total-opps" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 tabular-nums">0</div>
+          <p class="text-xs text-emerald-500/80 mt-1">Eşik değerini geçen fırsatlar</p>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-gray-400">
+          <span class="text-xs font-semibold uppercase tracking-wider">Aktif Özel Takipler</span>
+          <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+        </div>
+        <div class="mt-3">
+          <div id="stat-active-targets" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 tabular-nums">0</div>
+          <p class="text-xs text-emerald-500/80 mt-1">Özel Arama Akışları</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS & FILTER BAR -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+      <!-- Category Pills -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 custom-scrollbar">
+        <button onclick="setCategoryFilter('', this)" class="cat-pill btn-tactile active px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+          Tümü
+        </button>
+        <button onclick="setCategoryFilter('CUSTOM', this)" class="cat-pill btn-tactile px-4 py-2 rounded-xl text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">
+          🎯 Özel Takipler
+        </button>
+        <button onclick="setCategoryFilter('smartphones', this)" class="cat-pill btn-tactile px-4 py-2 rounded-xl text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">
+          📱 iPhone
+        </button>
+        <button onclick="setCategoryFilter('gaming', this)" class="cat-pill btn-tactile px-4 py-2 rounded-xl text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">
+          🎮 PlayStation 5
+        </button>
+        <button onclick="setCategoryFilter('laptops', this)" class="cat-pill btn-tactile px-4 py-2 rounded-xl text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">
+          💻 MacBook
+        </button>
+        <button onclick="setCategoryFilter('premium_home', this)" class="cat-pill btn-tactile px-4 py-2 rounded-xl text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">
+          💨 Dyson / Ev
+        </button>
+      </div>
+
+      <!-- Search, City Filter & View Mode -->
+      <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        <!-- City Filter Dropdown -->
+        <div class="relative">
+          <select id="city-filter" onchange="filterLocalListings()" class="px-3 py-2 pr-7 rounded-xl bg-gray-800/90 border border-gray-700 text-xs text-white focus:outline-none focus:border-indigo-500 appearance-none cursor-pointer">
+            <option value="">🏙️ Tüm Şehirler</option>
+            <option value="İstanbul">İstanbul</option>
+            <option value="Ankara">Ankara</option>
+            <option value="İzmir">İzmir</option>
+            <option value="Bursa">Bursa</option>
+            <option value="Antalya">Antalya</option>
+            <option value="Adana">Adana</option>
+            <option value="Konya">Konya</option>
+            <option value="Gaziantep">Gaziantep</option>
+            <option value="Kocaeli">Kocaeli</option>
+            <option value="Mersin">Mersin</option>
+            <option value="Samsun">Samsun</option>
+            <option value="Kayseri">Kayseri</option>
+            <option value="Eskişehir">Eskişehir</option>
+          </select>
+          <svg class="w-3.5 h-3.5 text-gray-400 absolute right-2.5 top-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+
+        <div class="relative flex-1 sm:w-60">
+          <input id="search-input" oninput="filterLocalListings()" type="text" placeholder="İlan ara (örn: iPhone, M2, Dyson)..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-800/90 border border-gray-700 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500">
+          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <button onclick="switchTab('deals')" id="tab-btn-deals" class="px-3.5 py-2 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-xs font-semibold transition-all">
+            Fırsatlar
+          </button>
+          <button onclick="switchTab('explorer')" id="tab-btn-explorer" class="px-3.5 py-2 rounded-xl bg-gray-800 text-gray-400 border border-gray-700 hover:text-white text-xs font-semibold transition-all">
+            Tüm İlanlar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPPORTUNITY FEED CONTAINER -->
+    <section id="deals-view" class="space-y-4">
+      <div id="deals-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+      <div id="no-deals-message" class="hidden text-center py-16 glass-card rounded-2xl">
+        <div class="w-16 h-16 rounded-full bg-gray-800/80 text-gray-500 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-gray-300">Henüz Fırsat Eşleşmesi Bulunamadı</h3>
+        <p class="text-xs text-gray-500 max-w-md mx-auto mt-1">Yukarıdaki "Hemen Tara" butonuna tıklayarak seçili kategorilerde tarama yapabilirsiniz.</p>
+      </div>
+    </section>
+
+    <!-- DATABASE EXPLORER VIEW -->
+    <section id="explorer-view" class="hidden space-y-4">
+      <div class="glass-card rounded-2xl overflow-hidden">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-white">Veritabanında Kayıtlı Son İlanlar</h2>
+          <span id="raw-count-badge" class="px-2.5 py-0.5 rounded-full text-xs bg-gray-800 text-gray-400">0 İlan</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-gray-300">
+            <thead class="bg-gray-800/60 uppercase tracking-wider text-gray-400 text-[10px]">
+              <tr>
+                <th class="py-3 px-4">Kategori</th>
+                <th class="py-3 px-4">İlan Başlığı</th>
+                <th class="py-3 px-4">Fiyat</th>
+                <th class="py-3 px-4">Konum</th>
+                <th class="py-3 px-4">Son Görülme</th>
+                <th class="py-3 px-4 text-right">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="raw-listings-tbody" class="divide-y divide-gray-800/80">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CUSTOM TARGETS (PRO MODE) MODAL -->
+  <div id="targets-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden modal-overlay">
+    <div class="glass-card modal-box rounded-2xl max-w-2xl w-full p-6 border border-gray-700/80 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </span>
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <span>🎯 Özel Arama & Takip Motoru</span>
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Pro Mod</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">Dilediğiniz Sahibinden arama URL'sini ekleyin, otomatik piyasa sapması ve kusur filtresi çalışsın.</p>
+          </div>
+        </div>
+        <button onclick="toggleCustomTargetsModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto space-y-6 pr-1 custom-scrollbar flex-1">
+        <!-- New Target Form -->
+        <div class="p-4 rounded-xl bg-gray-900/70 border border-gray-800 space-y-3.5">
+          <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>➕ Yeni Takip Akışı Ekle</span>
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-300 mb-1">Takip / Ürün Adı *</label>
+              <input id="new-target-name" type="text" placeholder="Örn: Dyson V15 Detect, RTX 4080, MacBook M3" class="w-full px-3 py-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-300 mb-1">Min. Kâr Eşiği (TL)</label>
+              <input id="new-target-profit" type="number" value="3000" step="500" class="w-full px-3 py-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-gray-300 mb-1">Sahibinden Arama URL'si *</label>
+            <input id="new-target-url" type="url" placeholder="https://www.sahibinden.com/kelime-ve-filtreler..." class="w-full px-3 py-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+            <p class="text-[10px] text-gray-500 mt-1">İpucu: Sahibinden'de filtreleri (Param Güvende vb.) belirleyip adres çubuğundaki tam URL'yi buraya yapıştırın.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-300 mb-1">Hariç Tutulacak Kelimeler (Virgülle ayırın)</label>
+              <input id="new-target-keywords" type="text" placeholder="kırık, kutu, tamirli, arızalı, replika" class="w-full px-3 py-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-300 mb-1">Hedef Şehirler (Boş = Tüm Türkiye)</label>
+              <input id="new-target-cities" type="text" placeholder="Örn: İstanbul, Ankara, İzmir" class="w-full px-3 py-2 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-1">
+            <button onclick="addCustomTarget()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-all active:scale-95">
+              <span>➕ Takibi Kaydet & Başlat</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Existing Targets List -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-gray-300 uppercase tracking-wider">Kayıtlı Özel Takiplerim</h3>
+            <span id="target-count-badge" class="px-2 py-0.5 rounded-full text-[10px] bg-gray-800 text-gray-400">0 Takip</span>
+          </div>
+          <div id="targets-list-container" class="space-y-2.5">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end gap-3 pt-3 border-t border-gray-800">
+        <button onclick="toggleCustomTargetsModal()" class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-medium">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm hidden modal-overlay">
+    <div class="glass-card modal-box rounded-2xl max-w-lg w-full p-6 border border-gray-700/80 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+          </span>
+          <h2 class="text-base font-bold text-white">Radar Ayarları & Filtreler</h2>
+        </div>
+        <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-white">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Preset Category Toggles -->
+      <div class="space-y-3">
+        <label class="text-xs font-semibold text-gray-300 uppercase tracking-wider">İzlenen Paketler</label>
+        <div id="preset-toggles-container" class="space-y-2">
+          <!-- Dynamically generated checkboxes -->
+        </div>
+      </div>
+
+      <!-- Minimum Profit Threshold -->
+      <div class="space-y-2">
+        <div class="flex justify-between items-center text-xs">
+          <label class="font-semibold text-gray-300">Minimum Kâr Eşiği (TL)</label>
+          <span id="profit-value-display" class="font-bold text-emerald-400">₺3,000</span>
+        </div>
+        <input id="setting-min-profit" type="range" min="1000" max="25000" step="500" value="3000" oninput="updateProfitDisplay(this.value)" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+      </div>
+
+      <!-- Target Cities -->
+      <div class="space-y-2">
+        <label class="text-xs font-semibold text-gray-300">Hedef Şehirler (Boş ise Tüm Türkiye)</label>
+        <input id="setting-target-cities" type="text" placeholder="Örn: İstanbul, Ankara, İzmir" class="w-full px-3.5 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500">
+      </div>
+
+      <!-- Save Button -->
+      <div class="flex justify-end gap-3 pt-3 border-t border-gray-800">
+        <button onclick="toggleSettingsModal()" class="px-4 py-2 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700 text-xs font-medium">İptal</button>
+        <button onclick="saveSettings()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30">Kaydet & Uygula</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-xs font-medium text-white shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300">
+    <span id="toast-icon" class="text-emerald-400">●</span>
+    <span id="toast-text">Bildirim</span>
+  </div>
+
+  <!-- CLIENT LOGIC SCRIPT -->
+  <script>
+    let currentOpportunities = [];
+    let currentRawListings = [];
+    let currentConfig = {};
+    let currentPresets = {};
+    let activeCategory = '';
+    let currentTab = 'deals';
+    let isScanning = false;
+    let daemonActive = false;
+
+    // Turkish-aware Unicode Case Normalizer
+    function normalizeTr(s) {
+      if (!s) return "";
+      return String(s)
+        .replace(/İ/g, "i")
+        .replace(/I/g, "ı")
+        .toLowerCase()
+        .replace(/ı/g, "i")
+        .replace(/ğ/g, "g")
+        .replace(/ü/g, "u")
+        .replace(/ş/g, "s")
+        .replace(/ö/g, "o")
+        .replace(/ç/g, "c")
+        .trim();
+    }
+
+    // Toast Notification Utility
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      const icon = document.getElementById('toast-icon');
+
+      text.innerText = message;
+      icon.className = isSuccess ? 'text-emerald-400' : 'text-amber-400';
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+
+    // Tab Switching
+    function switchTab(tab) {
+      currentTab = tab;
+      const dealsView = document.getElementById('deals-view');
+      const explorerView = document.getElementById('explorer-view');
+      const btnDeals = document.getElementById('tab-btn-deals');
+      const btnExplorer = document.getElementById('tab-btn-explorer');
+
+      if (tab === 'deals') {
+        dealsView.classList.remove('hidden');
+        explorerView.classList.add('hidden');
+        btnDeals.className = "btn-tactile px-3.5 py-2 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-xs font-semibold";
+        btnExplorer.className = "btn-tactile px-3.5 py-2 rounded-xl bg-gray-800 text-gray-400 border border-gray-700 hover:text-white text-xs font-semibold";
+        renderDeals();
+      } else {
+        dealsView.classList.add('hidden');
+        explorerView.classList.remove('hidden');
+        btnDeals.className = "btn-tactile px-3.5 py-2 rounded-xl bg-gray-800 text-gray-400 border border-gray-700 hover:text-white text-xs font-semibold";
+        btnExplorer.className = "btn-tactile px-3.5 py-2 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-xs font-semibold";
+        if (currentRawListings.length === 0) {
+          fetchRawListings();
+        } else {
+          renderRawListings();
+        }
+      }
+    }
+
+    // Modal Control
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      if (modal.classList.contains('hidden')) {
+        modal.classList.add('modal-animating');
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          modal.classList.remove('modal-animating');
+        });
+      } else {
+        modal.classList.add('modal-animating');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          modal.classList.remove('modal-animating');
+        }, 180);
+      }
+    }
+
+    function updateProfitDisplay(val) {
+      document.getElementById('profit-value-display').innerText = '₺' + parseInt(val).toLocaleString('tr-TR');
+    }
+
+    // Category Filtering
+    function setCategoryFilter(cat, targetBtn) {
+      activeCategory = cat;
+      const btn = targetBtn || (window.event ? window.event.target.closest('.cat-pill') : null);
+      document.querySelectorAll('.cat-pill').forEach(b => {
+        b.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/20');
+        b.classList.add('bg-gray-800', 'text-gray-300');
+      });
+      if (btn) {
+        btn.classList.remove('bg-gray-800', 'text-gray-300');
+        btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/20');
+      }
+      filterLocalListings();
+    }
+
+    // Fetch and Update Dashboard Stats
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+
+        document.getElementById('stat-total-listings').innerText = (data.total_listings || 0).toLocaleString('tr-TR');
+        document.getElementById('stat-total-opps').innerText = (data.total_opportunities || 0).toLocaleString('tr-TR');
+        const activeTargets = data.active_targets_count || 0;
+        const targetStat = document.getElementById('stat-active-targets');
+        if (targetStat) targetStat.innerText = activeTargets.toLocaleString('tr-TR');
+        const navTarget = document.getElementById('nav-target-count');
+        if (navTarget) navTarget.innerText = activeTargets;
+
+        if (data.last_scan_time) {
+          const dt = new Date(data.last_scan_time);
+          document.getElementById('stat-last-scan').innerText = 'Son: ' + dt.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        updateDaemonBadge(data.is_daemon_active);
+        updateScanButtonState(data.is_scanning);
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    }
+
+    function updateDaemonBadge(active) {
+      daemonActive = active;
+      const badge = document.getElementById('daemon-badge');
+      const text = document.getElementById('daemon-text');
+      const btn = document.getElementById('daemon-btn-text');
+
+      if (active) {
+        badge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-medium text-emerald-400";
+        badge.children[0].className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+        text.innerText = "İzleme Aktif";
+        btn.innerText = "İzlemeyi Durdur";
+      } else {
+        badge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800/80 border border-gray-700/60 text-xs font-medium text-gray-400";
+        badge.children[0].className = "w-2 h-2 rounded-full bg-gray-500";
+        text.innerText = "Beklemede";
+        btn.innerText = "Otomatik İzle";
+      }
+    }
+
+    function updateScanButtonState(busy) {
+      isScanning = busy;
+      const btn = document.getElementById('btn-scan');
+      const text = document.getElementById('scan-btn-text');
+      const icon = document.getElementById('scan-icon');
+
+      if (busy) {
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+        icon.classList.add('animate-spin');
+        text.innerText = "Taranıyor...";
+      } else {
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        icon.classList.remove('animate-spin');
+        text.innerText = "Hemen Tara";
+      }
+    }
+
+    // Trigger Scan
+    async function triggerScan() {
+      if (isScanning) return;
+      updateScanButtonState(true);
+      showToast("Tarama başlatıldı...");
+
+      try {
+        const res = await fetch('/api/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ async: true })
+        });
+        const data = await res.json();
+        // Wait 3 seconds and refresh
+        setTimeout(async () => {
+          await fetchStats();
+          await fetchOpportunities();
+        }, 3500);
+      } catch (err) {
+        showToast("Tarama hatası: " + err, false);
+      }
+    }
+
+    // Toggle Daemon Loop
+    async function toggleDaemon() {
+      try {
+        const res = await fetch('/api/scanner/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'toggle' })
+        });
+        const data = await res.json();
+        updateDaemonBadge(data.daemon_active);
+        showToast(data.daemon_active ? "Sürekli izleme başlatıldı" : "Sürekli izleme durduruldu");
+      } catch (err) {
+        showToast("Bağlantı hatası", false);
+      }
+    }
+
+    // Dynamic City Dropdown Populator
+    function populateCityDropdown(items) {
+      const select = document.getElementById('city-filter');
+      if (!select || !items) return;
+
+      const existingValues = new Set(Array.from(select.options).map(o => normalizeTr(o.value)));
+
+      items.forEach(it => {
+        if (!it.location) return;
+        const parts = it.location.trim().split(/\s+/);
+        const cityCandidate = parts[0];
+        if (cityCandidate && cityCandidate.length >= 3 && !existingValues.has(normalizeTr(cityCandidate))) {
+          existingValues.add(normalizeTr(cityCandidate));
+          const opt = document.createElement('option');
+          opt.value = cityCandidate;
+          opt.textContent = cityCandidate;
+          select.appendChild(opt);
+        }
+      });
+    }
+
+    const PRESET_CATEGORIES = new Set([
+      'smartphones', 'gaming', 'laptops', 'premium_home',
+      'iphone_15_pro', 'iphone_14_pro', 'iphone_13',
+      'ps5', 'macbook_silicon', 'dyson_tech'
+    ]);
+
+    // Unified Filter Predicate across Deals and Explorer
+    function matchesFilter(item, catFilter, queryNorm, cityNorm) {
+      const itemCat = item.category || '';
+      const itemCatNorm = normalizeTr(itemCat);
+      const itemTitleNorm = normalizeTr(item.title || '');
+      const itemLocNorm = normalizeTr(item.location || '');
+      const itemVarNorm = normalizeTr(item.variant || '');
+
+      // 1. Category Filter
+      if (catFilter === 'CUSTOM') {
+        if (PRESET_CATEGORIES.has(itemCat)) return false;
+      } else if (catFilter === 'smartphones') {
+        const isMatch = ['iphone_13', 'iphone_14_pro', 'iphone_15_pro', 'smartphones'].includes(itemCat) ||
+                        itemCatNorm.includes('iphone') || itemCatNorm.includes('smartphone');
+        if (!isMatch) return false;
+      } else if (catFilter === 'gaming') {
+        const isMatch = ['ps5', 'gaming'].includes(itemCat) ||
+                        itemCatNorm.includes('ps5') || itemCatNorm.includes('gaming') || itemCatNorm.includes('playstation');
+        if (!isMatch) return false;
+      } else if (catFilter === 'laptops') {
+        const isMatch = ['macbook_silicon', 'laptops'].includes(itemCat) ||
+                        itemCatNorm.includes('macbook') || itemCatNorm.includes('laptop');
+        if (!isMatch) return false;
+      } else if (catFilter === 'premium_home') {
+        const isMatch = ['dyson_tech', 'premium_home'].includes(itemCat) ||
+                        itemCatNorm.includes('dyson') || itemCatNorm.includes('home');
+        if (!isMatch) return false;
+      } else if (catFilter && itemCatNorm !== normalizeTr(catFilter)) {
+        return false;
+      }
+
+      // 2. City Filter
+      if (cityNorm) {
+        if (!itemLocNorm.includes(cityNorm)) return false;
+      }
+
+      // 3. Search Query Filter (Title, Location, Variant, or Category)
+      if (queryNorm) {
+        const matchTitle = itemTitleNorm.includes(queryNorm);
+        const matchLoc = itemLocNorm.includes(queryNorm);
+        const matchVar = itemVarNorm.includes(queryNorm);
+        const matchCat = itemCatNorm.includes(queryNorm);
+        if (!matchTitle && !matchLoc && !matchVar && !matchCat) return false;
+      }
+
+      return true;
+    }
+
+    // Master Dispatcher for filtering current active view
+    function filterLocalListings() {
+      if (currentTab === 'deals') {
+        renderDeals();
+      } else {
+        renderRawListings();
+      }
+    }
+
+    // Fetch Opportunities
+    async function fetchOpportunities() {
+      try {
+        const res = await fetch('/api/opportunities?limit=100');
+        currentOpportunities = await res.json();
+        populateCityDropdown(currentOpportunities);
+        renderDeals();
+      } catch (err) {
+        console.error('Error fetching opportunities:', err);
+      }
+    }
+
+    // Render Opportunity Cards
+    function renderDeals() {
+      const container = document.getElementById('deals-container');
+      const noDeals = document.getElementById('no-deals-message');
+      const queryNorm = normalizeTr(document.getElementById('search-input').value);
+      const cityNorm = normalizeTr(document.getElementById('city-filter').value);
+
+      const filtered = currentOpportunities.filter(item => matchesFilter(item, activeCategory, queryNorm, cityNorm));
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        noDeals.classList.remove('hidden');
+        return;
+      }
+
+      noDeals.classList.add('hidden');
+      container.innerHTML = filtered.map(item => {
+        const itemCat = item.category || '';
+        const isCustomTarget = !PRESET_CATEGORIES.has(itemCat);
+        const hasFlaws = item.detected_flaws && item.detected_flaws.length > 0;
+
+        // Flaw pills vs Honest Clean badge (no artificial % score)
+        const conditionBadges = hasFlaws
+          ? item.detected_flaws.map(f => `<span class="px-2.5 py-0.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] font-semibold flex items-center gap-1">⚠️ ${formatFlaw(f)}</span>`).join('')
+          : `<span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold flex items-center gap-1">🛡️ Temiz</span>`;
+
+        return `
+          <div class="glass-card rounded-2xl p-5 flex flex-col justify-between hover:-translate-y-1">
+            <div>
+              <!-- Header Meta -->
+              <div class="flex items-center justify-between text-xs text-gray-400 mb-2.5">
+                ${isCustomTarget 
+                  ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-bold text-[11px] border border-emerald-500/30">🎯 ${escapeHtml(item.category)}</span>`
+                  : `<span class="px-2.5 py-0.5 rounded-full bg-gray-800/90 font-semibold text-gray-300 text-[11px] border border-gray-700/60">${formatCategory(item.category)}</span>`
+                }
+                <span class="flex items-center gap-1 text-[11px] text-gray-400">
+                  <svg class="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  ${item.location || 'Bilinmiyor'}
+                </span>
+              </div>
+
+              <!-- Title -->
+              <h3 class="text-sm font-bold text-white leading-snug line-clamp-2 hover:text-indigo-400 transition-colors">
+                <a href="${item.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>
+              </h3>
+
+              <!-- Variant Details & Expert Verdict -->
+              <div class="mt-3 flex flex-wrap gap-1.5 items-center">
+                <span class="px-2 py-0.5 rounded-lg bg-gray-800/80 text-gray-300 border border-gray-700/80 text-[11px] font-semibold">${item.variant || 'Standart'}</span>
+                ${conditionBadges}
+              </div>
+            </div>
+
+            <!-- Price & Arbitrage Box -->
+            <div class="mt-5 pt-4 border-t border-gray-800/80">
+              <div class="flex items-end justify-between">
+                <div>
+                  <div class="text-[11px] text-gray-400 font-medium">İlan Fiyatı</div>
+                  <div class="text-xl font-extrabold text-white tabular-nums tracking-tight">₺${item.price.toLocaleString('tr-TR')}</div>
+                  <div class="text-[11px] text-gray-500 tabular-nums line-through mt-0.5">Piyasa Medyanı: ₺${item.fair_price.toLocaleString('tr-TR')}</div>
+                </div>
+                <div class="text-right">
+                  <div class="px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-extrabold text-sm glow-green tabular-nums">
+                    +₺${item.profit_margin.toLocaleString('tr-TR')}
+                  </div>
+                  <div class="text-[10px] text-emerald-400/90 font-bold mt-1 tabular-nums">-%${item.discount_pct.toFixed(1)} İndirim</div>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="mt-4 flex items-center gap-2">
+                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn-tactile flex-1 text-center py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/25 flex items-center justify-center gap-1.5">
+                  <span>İlana Git</span>
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+                <button onclick="dismissOpportunity(${item.id})" title="Gözardı et" class="btn-tactile p-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-400 hover:text-white">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Dismiss Opportunity
+    async function dismissOpportunity(id) {
+      try {
+        await fetch('/api/opportunities/dismiss', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        });
+        currentOpportunities = currentOpportunities.filter(o => o.id !== id);
+        renderDeals();
+        fetchStats();
+        showToast("Fırsat listeden kaldırıldı");
+      } catch (err) {
+        showToast("Kaldırma hatası", false);
+      }
+    }
+
+    // Custom Targets Modal & Actions (Pro Mode)
+    function toggleCustomTargetsModal() {
+      const modal = document.getElementById('targets-modal');
+      if (modal.classList.contains('hidden')) {
+        loadCustomTargets();
+        modal.classList.add('modal-animating');
+        modal.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          modal.classList.remove('modal-animating');
+        });
+      } else {
+        modal.classList.add('modal-animating');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          modal.classList.remove('modal-animating');
+        }, 180);
+      }
+    }
+
+    async function loadCustomTargets() {
+      try {
+        const res = await fetch('/api/targets');
+        const targets = await res.json();
+        const container = document.getElementById('targets-list-container');
+        const badge = document.getElementById('target-count-badge');
+        badge.innerText = `${targets.length} Takip`;
+
+        if (targets.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-6 px-4 rounded-xl bg-gray-800/40 border border-gray-800 text-xs text-gray-500">
+              Henüz özel arama linki eklenmedi. Yukarıdaki formdan Sahibinden aramanızı ekleyebilirsiniz.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = targets.map(t => {
+          const isEnabled = t.enabled === 1;
+          const kws = (t.negative_keywords || []).map(k => `<span class="px-2 py-0.5 rounded bg-gray-800 text-gray-400 text-[10px] border border-gray-700">-${escapeHtml(k)}</span>`).join(' ');
+          const cities = (t.target_cities || []).join(', ');
+
+          return `
+            <div class="p-3.5 rounded-xl bg-gray-800/60 border border-gray-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-gray-600 transition-colors">
+              <div class="space-y-1 flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-white truncate">🎯 ${escapeHtml(t.name)}</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${isEnabled ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-gray-700 text-gray-400'}">
+                    ${isEnabled ? 'Aktif' : 'Pasif'}
+                  </span>
+                  <span class="text-[11px] font-medium text-emerald-400">Min: ₺${(t.min_profit_tl || 3000).toLocaleString('tr-TR')}</span>
+                </div>
+                <div class="flex items-center gap-2 text-[11px] text-gray-400">
+                  <a href="${escapeHtml(t.url)}" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:underline flex items-center gap-1 truncate max-w-sm">
+                    <span class="truncate">${escapeHtml(t.url)}</span>
+                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                  ${cities ? `<span class="text-gray-500 text-[10px]">📍 ${escapeHtml(cities)}</span>` : ''}
+                </div>
+                ${kws ? `<div class="flex flex-wrap gap-1 pt-0.5">${kws}</div>` : ''}
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center">
+                <button onclick="toggleTarget(${t.id})" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${isEnabled ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20'}">
+                  ${isEnabled ? 'Durdur' : 'Aktifleştir'}
+                </button>
+                <button onclick="deleteTarget(${t.id})" title="Takibi Sil" class="p-1.5 rounded-lg bg-gray-800 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 border border-gray-700 transition-colors">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error loading custom targets:', err);
+      }
+    }
+
+    async function addCustomTarget() {
+      const nameInput = document.getElementById('new-target-name');
+      const urlInput = document.getElementById('new-target-url');
+      const profitInput = document.getElementById('new-target-profit');
+      const kwsInput = document.getElementById('new-target-keywords');
+      const citiesInput = document.getElementById('new-target-cities');
+
+      const name = nameInput.value.trim();
+      const url = urlInput.value.trim();
+      if (!name || !url) {
+        showToast("Lütfen isim ve Sahibinden URL girin", false);
+        return;
+      }
+
+      const minProfit = parseInt(profitInput.value) || 3000;
+      const kws = kwsInput.value ? kwsInput.value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : [];
+      const cities = citiesInput.value ? citiesInput.value.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+      try {
+        const res = await fetch('/api/targets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            url: url,
+            min_profit_tl: minProfit,
+            negative_keywords: kws,
+            target_cities: cities
+          })
+        });
+        const data = await res.json();
+        if (data.status === 'created') {
+          nameInput.value = '';
+          urlInput.value = '';
+          kwsInput.value = '';
+          citiesInput.value = '';
+          showToast(`"${name}" takibe alındı`);
+          loadCustomTargets();
+          fetchStats();
+        } else {
+          showToast(data.message || "Hata oluştu", false);
+        }
+      } catch (err) {
+        showToast("Takip ekleme hatası", false);
+      }
+    }
+
+    async function toggleTarget(id) {
+      try {
+        const res = await fetch('/api/targets/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        });
+        loadCustomTargets();
+        fetchStats();
+        showToast("Hedef durumu güncellendi");
+      } catch (err) {
+        showToast("İşlem başarısız", false);
+      }
+    }
+
+    async function deleteTarget(id) {
+      if (!confirm("Bu özel takibi silmek istediğinize emin misiniz?")) return;
+      try {
+        const res = await fetch('/api/targets/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        });
+        loadCustomTargets();
+        fetchStats();
+        showToast("Takip başarıyla silindi");
+      } catch (err) {
+        showToast("Silme hatası", false);
+      }
+    }
+
+    // Fetch Raw Listings for Database Explorer
+    async function fetchRawListings() {
+      try {
+        const res = await fetch('/api/listings?limit=500');
+        currentRawListings = await res.json();
+        populateCityDropdown(currentRawListings);
+        renderRawListings();
+      } catch (err) {
+        console.error('Error fetching raw listings:', err);
+      }
+    }
+
+    // Render Filtered Raw Listings Table
+    function renderRawListings() {
+      const tbody = document.getElementById('raw-listings-tbody');
+      const countBadge = document.getElementById('raw-count-badge');
+      const queryNorm = normalizeTr(document.getElementById('search-input').value);
+      const cityNorm = normalizeTr(document.getElementById('city-filter').value);
+
+      const filtered = currentRawListings.filter(item => matchesFilter(item, activeCategory, queryNorm, cityNorm));
+
+      countBadge.innerText = `${filtered.length} İlan (${currentRawListings.length} Kayıtlı)`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-12 text-center text-xs text-gray-500">
+              Seçili filtrelerle veya şehirle eşleşen kayıtlı ilan bulunamadı.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const itemCat = item.category || '';
+        const isCustomTarget = !PRESET_CATEGORIES.has(itemCat);
+
+        return `
+          <tr class="hover:bg-white/[0.03] transition-colors border-b border-gray-800/60">
+            <td class="py-3 px-4 font-semibold text-gray-300">
+              ${isCustomTarget 
+                ? `<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">🎯 ${escapeHtml(item.category)}</span>`
+                : `<span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300 border border-gray-700 text-[10px]">${formatCategory(item.category)}</span>`
+              }
+            </td>
+            <td class="py-3 px-4 font-medium text-white max-w-sm truncate">
+              <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="hover:text-indigo-400 transition-colors">
+                ${escapeHtml(item.title)}
+              </a>
+            </td>
+            <td class="py-3 px-4 font-extrabold text-white whitespace-nowrap tabular-nums">₺${item.price.toLocaleString('tr-TR')}</td>
+            <td class="py-3 px-4 text-gray-400 whitespace-nowrap">
+              <span class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                ${item.location || '-'}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-gray-400 whitespace-nowrap text-[11px] tabular-nums">${item.last_seen ? new Date(item.last_seen).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'}</td>
+            <td class="py-3 px-4 text-right whitespace-nowrap">
+              <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn-tactile px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white border border-indigo-500/30 text-xs font-semibold inline-flex items-center gap-1">
+                <span>İlana Git</span>
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Load Settings into Modal
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        currentConfig = data.config || {};
+        currentPresets = data.presets || {};
+
+        // Populate preset checkboxes
+        const container = document.getElementById('preset-toggles-container');
+        const activeList = currentConfig.active_presets || [];
+
+        container.innerHTML = Object.entries(currentPresets).map(([key, p]) => {
+          const isChecked = activeList.includes(key);
+          return `
+            <label class="flex items-center justify-between p-3 rounded-xl bg-gray-800/80 border border-gray-700/60 cursor-pointer hover:bg-gray-800">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" value="${key}" ${isChecked ? 'checked' : ''} class="preset-checkbox w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-gray-900 border-gray-700">
+                <div>
+                  <div class="text-xs font-bold text-white">${escapeHtml(p.name)}</div>
+                  <div class="text-[11px] text-gray-400">${escapeHtml(p.description || '')}</div>
+                </div>
+              </div>
+            </label>
+          `;
+        }).join('');
+
+        // Populate Profit & Cities
+        const profit = currentConfig.min_profit_tl || 3000;
+        document.getElementById('setting-min-profit').value = profit;
+        updateProfitDisplay(profit);
+
+        const cities = (currentConfig.target_cities || []).join(', ');
+        document.getElementById('setting-target-cities').value = cities;
+      } catch (err) {
+        console.error('Error loading config:', err);
+      }
+    }
+
+    // Save Settings
+    async function saveSettings() {
+      const checkedPresets = Array.from(document.querySelectorAll('.preset-checkbox:checked')).map(cb => cb.value);
+      const minProfit = parseInt(document.getElementById('setting-min-profit').value);
+      const citiesRaw = document.getElementById('setting-target-cities').value;
+      const targetCities = citiesRaw ? citiesRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+      try {
+        const res = await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            active_presets: checkedPresets,
+            min_profit_tl: minProfit,
+            target_cities: targetCities
+          })
+        });
+        const data = await res.json();
+        toggleSettingsModal();
+        showToast("Ayarlar başarıyla kaydedildi");
+        fetchStats();
+      } catch (err) {
+        showToast("Ayarlar kaydedilemedi", false);
+      }
+    }
+
+    // Formatters
+    function formatCategory(cat) {
+      const map = {
+        'smartphones': 'iPhone',
+        'gaming': 'PlayStation 5',
+        'laptops': 'MacBook',
+        'premium_home': 'Dyson',
+        'iphone_15_pro': 'iPhone 15 Pro',
+        'iphone_14_pro': 'iPhone 14 Pro',
+        'iphone_13': 'iPhone 13',
+        'ps5': 'PS5',
+        'macbook_silicon': 'MacBook',
+        'dyson_tech': 'Dyson'
+      };
+      return map[cat] || cat;
+    }
+
+    function formatFlaw(flaw) {
+      const map = {
+        'screen_replaced_aftermarket': 'Yan Sanayi Ekran',
+        'screen_replaced': 'Ekran Değişmiş',
+        'true_tone_disabled': 'True Tone Yok',
+        'face_id_failure': 'Face ID Arızalı',
+        'touch_id_failure': 'Touch ID Arızalı',
+        'battery_replaced': 'Pil Değişmiş',
+        'deep_scratches': 'Derin Çizikler',
+        'case_dented': 'Kasada Ezik/Darbedir',
+        'back_glass_cracked': 'Arka Cam Kırık'
+      };
+      return map[flaw] || flaw.replace(/_/g, ' ');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Auto-refresh interval (every 8 seconds)
+    setInterval(() => {
+      fetchStats();
+    }, 8000);
+
+    // Initial Load
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadConfig();
+      await fetchStats();
+      await fetchOpportunities();
+      fetchRawListings();
+    });
+  </script>
+</body>
+</html>
