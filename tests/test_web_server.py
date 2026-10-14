@@ -4,12 +4,15 @@ Tests /api/stats, /api/opportunities, /api/config, and static HTML serving.
 """
 
 import json
+import shutil
+import tempfile
 import threading
 import time
 import unittest
 import urllib.request
 from pathlib import Path
 
+from radar_db import init_db
 from web_server import RadarAPIHandler, RadarController, ThreadingHTTPServer
 
 
@@ -20,11 +23,22 @@ class TestWebServer(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.temp_dir = tempfile.TemporaryDirectory()
+        test_dir = Path(cls.temp_dir.name)
+        db_path = test_dir / "test_radar.db"
+        init_db(db_path)
+
         base_dir = Path(__file__).parent.parent
-        db_path = base_dir / "radar.db"
-        config_path = base_dir / "config.json"
+        config_path = test_dir / "config.json"
         presets_path = base_dir / "presets.json"
         web_dir = base_dir / "web"
+
+        example_cfg = base_dir / "config.example.json"
+        if example_cfg.exists():
+            shutil.copy(example_cfg, config_path)
+        else:
+            with open(config_path, "w", encoding="utf-8") as f:
+                json.dump({"active_presets": []}, f)
 
         controller = RadarController(db_path, config_path, presets_path)
         RadarAPIHandler.controller = controller
@@ -39,6 +53,7 @@ class TestWebServer(unittest.TestCase):
     def tearDownClass(cls):
         cls.server.shutdown()
         cls.server.server_close()
+        cls.temp_dir.cleanup()
 
     def _get(self, path: str):
         url = f"http://127.0.0.1:{self.port}{path}"
