@@ -4,6 +4,13 @@
 
 Automated second-hand marketplace arbitrage scanner and deal detection radar by SS2Genji. Built with Python 3's standard library and a native Node.js Chrome DevTools Protocol (CDP) worker. Evaluates live marketplace listings against statistical price distributions, extracts Turkish defect and damage clauses, and displays actionable opportunities in a desktop terminal interface.
 
+> [!WARNING]
+> **Rate limiting and safety notice:**
+> Marketplace anti-bot systems restrict IP addresses that issue frequent automated requests. To keep your access safe and avoid temporary rate limits:
+> - Keep the default scanning intervals between 45 and 75 seconds in `config.json`. Do not reduce intervals below 30 seconds.
+> - Monitor a focused set of active targets rather than running dozens of concurrent category scans.
+> - This software is intended strictly for personal price comparison and fair-use market tracking. Users are responsible for complying with platform terms of service and avoiding server load.
+
 ---
 
 ## Architecture overview

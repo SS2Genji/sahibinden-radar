@@ -4,6 +4,13 @@
 
 SS2Genji tarafından geliştirilen, ikinci el pazar yerlerinde arbitraj ve ani fiyat düşüşlerini gerçek zamanlı yakalayan masaüstü radar sistemi. Python 3 standart kütüphanesi ve harici bağımlılık barındırmayan yerel Node.js Chrome DevTools Protocol (CDP) istemcisi üzerine inşa edilmiştir. Canlı ilanları istatistiksel fiyat dağılımlarına göre anlık değerlendirir, Türkçe kusur ve hasar bildirimlerini dilbilgisi düzeyinde ayrıştırır ve fırsatları yerel masaüstü terminal arayüzünde sunar.
 
+> [!WARNING]
+> **Önemli Kullanım ve Tarama Sıklığı Uyarısı:**
+> İlan platformlarının bot koruma sistemleri aşırı sık veya agresif istek atan IP adreslerini geçici olarak engelleyebilir (rate limit / doğrulama sayfası). Güvenli ve kesintisiz kullanım için:
+> - `config.json` dosyasındaki tarama aralıklarını (varsayılan 45 ile 75 saniye) 30 saniyenin altına düşürmeyin.
+> - Aynı anda onlarca agresif kategori taramak yerine odaklandığınız belirli ürün hedeflerini izleyin.
+> - Bu yazılım yalnızca kişisel pazar araştırması ve fiyat karşılaştırması amacıyla sunulmuştur. Platform kurallarına uymak ve sunucu yükü oluşturmamak kullanıcının kendi sorumluluğundadır.
+
 ---
 
 ## Mimari genel bakış
