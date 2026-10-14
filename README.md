@@ -1,5 +1,7 @@
 # Sahibinden Arbitraj & Fırsat Radarı
 
+[ 🇬🇧 English ](README.md) | [ 🇹🇷 Türkçe ](README.tr.md)
+
 Automated second-hand marketplace arbitrage scanner and deal detection radar by SS2Genji. Built with Python 3's standard library and a native Node.js Chrome DevTools Protocol (CDP) worker. Evaluates live marketplace listings against statistical price distributions, extracts Turkish defect and damage clauses, and displays actionable opportunities in a desktop terminal interface.
 
 ---
@@ -48,7 +50,7 @@ The radar operates without third-party web scraping frameworks or cloud APIs. It
 
 ### Prerequisites
 
-- Python 3.10 or newer (uses standard library only, no `pip install` needed)
+- Python 3.10 or newer (uses standard library only, no external dependencies)
 - Node.js 18 or newer (uses native WebSocket and fetch)
 - Google Chrome, Chromium, or Brave browser
 
@@ -169,61 +171,62 @@ The file `config.json` controls global thresholds:
 
 ---
 
-## Statistical arbitrage algorithms
+## Mathematical model and statistical arbitrage algorithms
 
 The analysis pipeline avoids static price lists. It calculates fair market values dynamically using non-parametric order statistics, Tukey fences, and Turkish natural language clause parsing.
 
-### Adaptive market pricing (`AdaptiveMarketEngine`)
+### 1. Two-stage in-place outlier and scam trimming (`AdaptiveMarketEngine`)
 
-Traditional arithmetic means fail on marketplace listings because low placeholders (1 TL ads) and inflated sellers distort averages. The engine uses order-statistic trimming:
+Given $N_{\text{raw}}$ sorted valid historical prices, a coarse plausibility bound $\text{floor}_0 = \max(100.0, \; 0.35 \cdot \text{Med}_0)$ strips extreme placeholder listings (such as $1\text{ TL}$ or $50\text{ TL}$) in $\mathcal{O}(\log N)$ time via binary search so they cannot corrupt $Q_1$. On the resulting range $[lo_1, hi_1)$ of size $N_1$:
 
-1. **Placeholder pre-trim:**
-   The engine removes placeholder entries before computing percentiles:
-   $$\text{Floor}_{\text{coarse}} = \max\left(100, 0.35 \times \text{Median}_{\text{raw}}\right)$$
-   Binary search index bounds $[lo, hi)$ discard corrupting low listings in $O(\log N)$ time.
+When $N_1 \ge 4$, Tukey hinges $Q_1, Q_3$ and $\text{IQR} = Q_3 - Q_1$ are computed in $\mathcal{O}(1)$ time. Historical observations are narrowed via binary search to $[F_{\text{low}}, F_{\text{high}}]$ where:
 
-2. **Tukey fence trimming:**
-   When sample size $N \ge 4$, the engine calculates the first quartile $Q_1$ and third quartile $Q_3$, defining the interquartile range ($IQR = Q_3 - Q_1$). Listings outside the fence are discarded:
-   $$[\text{Fence}_{\text{low}}, \text{Fence}_{\text{high}}] = [Q_1 - 1.5 \times IQR, \;\; Q_3 + 1.5 \times IQR]$$
+$$F_{\text{low}} = \max\left(100.0, \; 0.35 \cdot \text{Med}_1, \; Q_1 - 1.5 \cdot \text{IQR}\right), \qquad F_{\text{high}} = \begin{cases} Q_3 + 1.5 \cdot \text{IQR} & \text{if } \text{IQR} > 0 \\ 1.85 \cdot \text{Med}_1 & \text{if } \text{IQR} = 0 \end{cases}$$
 
-3. **Dynamic scam floor:**
-   To catch scam deposits, accessory-only listings, or humor posts:
-   $$\text{Dynamic Floor} = \max\left(100 \text{ TL}, \; 0.35 \times \text{Median}_{\text{clean}}\right)$$
-   Any listing priced below this boundary is flagged as `is_scam_or_placeholder` and blocked from firing arbitrage alerts.
+For candidate scam and placeholder classification (`is_scam_or_placeholder`), the dynamic floor adapts to sample size while stabilizing zero-variance cohorts ($\text{IQR} \to 0$) via $\text{IQR}_{\text{eff}} = \max(\text{IQR}, \; 0.25 \cdot \text{Med})$ so legitimate $12\%\text{ to }35\%$ discounts are not misclassified as scams when historical prices are identical:
 
-4. **Log-sigmoid sample confidence scaling:**
-   Small cohorts ($N = 3..5$) carry higher statistical variance than mature cohorts ($N \ge 25$). The engine weights confidence through a continuous log-sigmoid function:
-   $$S_N(N) = \frac{1}{1 + \exp\left(-k \cdot (\ln(N) - \ln(N_0))\right)}$$
-   With steepness $k = 1.35$ and center $N_0 = 2.5$, confidence reaches $0.50$ at $N = 3$, $0.80$ at $N = 15$, and exceeds $0.92$ at $N \ge 30$.
+$$\text{Floor}_{\text{dyn}} = \begin{cases} \max\left(100.0, \; Q_1 - 1.5 \cdot \text{IQR}_{\text{eff}}\right) & \text{if } N \ge 4 \\ \max\left(100.0, \; 0.35 \cdot \text{Med}\right) & \text{if } N < 4 \end{cases}$$
 
-5. **Dispersion penalty:**
-   Cohorts with high variance are penalized using the ratio of effective IQR to the median:
-   $$\text{Penalty}_{\text{dispersion}} = \min\left(1.0, \; \frac{IQR_{\text{effective}}}{\text{Fair Market Price}}\right)$$
-   $$\text{Confidence} = S_N(N) \times \left(1.0 - 0.5 \times \text{Penalty}_{\text{dispersion}}\right)$$
+### 2. Log-sigmoid sample saturation and MAD stability confidence ($C \in [0.0, 1.0]$)
 
-6. **Streaming median absolute deviation (MAD):**
-   Dispersion is calculated in $O(N)$ time with consistency scaling:
-   $$MAD = \text{median}\left(|X_i - \text{median}(X)|\right) \times 1.4826$$
+Sample confidence combines a log-logistic sample saturation curve $S_N(N)$ with a normal-consistent MAD dispersion stability score $S_{\text{MAD}}$:
 
-### Turkish defect extraction (`HonestDefectExtractor`)
+$$S_N(N) = \frac{1}{1 + \exp\left(-1.35 \cdot (\ln N - \ln 2.5)\right)}, \qquad S_{\text{MAD}} = \exp\left(-1.8 \cdot \frac{1.4826 \cdot \text{MAD}}{\text{Med}}\right)$$
 
-Classifying electronics requires distinguishing damaged devices from genuine discounts. The Turkish language uses clause-dependent negation where single-word searches produce false positives.
+$$C = \text{clamp}_{[0.0, 1.0]}\left(S_N(N) \cdot \left(0.35 + 0.65 \cdot S_{\text{MAD}}\right)\right)$$
 
-The extractor uses punctuation-aware clause parsing:
+For stable cohorts, this produces $C \approx 0.54$ at $N = 3$, $C \approx 0.69$ at $N = 5$, and $C \approx 0.89 > 0.80$ at $N = 15$.
 
-1. **Clause splitting:**
-   Text is split on punctuation (`.`, `,`, `;`, `-`) and adversative conjunctions (`ama`, `fakat`, `lakin`, `ancak`, `yalnız`).
+Streaming Median Absolute Deviation (MAD) is calculated in $O(N)$ time with consistency scaling:
+$$MAD = \text{median}\left(|X_i - \text{median}(X)|\right) \times 1.4826$$
 
-2. **Negation vs. affirmation disambiguation:**
-   - Phrases containing negative suffixes or negation indicators (`değişen yok`, `çiziksiz`, `hatasız`, `çalışmayan aksamı yoktur`) are resolved as affirmative health claims.
-   - Phrases indicating physical repair (`ekran değişti`, `pil değişti`, `kasa ezik`, `arka cam kırık`, `face id çalışmıyor`) extract as defect tokens.
+### 3. First-governing-predicate negation resolution (`HonestDefectExtractor`)
 
-3. **Binary status label:**
+In Turkish classifieds, commas frequently coordinate multiple nouns governed by a single clause-final predicate (for example, *"Kasada ezik, vuruk, çizik yoktur"*), or splice contrasting clauses (*"Kasada ezik var, çizik yok"*). Treating a comma as a hard clause boundary causes false positives on coordinate lists.
+
+`HonestDefectExtractor` resolves this in $\mathcal{O}(1)$ time per match using First-Governing-Predicate resolution:
+
+1. **Clause window slicing:**
+   The parser inspects a forward 65-character window up to hard clause boundaries:
+   ```python
+   _HARD_CLAUSE_STOP_RE = re.compile(
+       r"[.;!?\n\r]+|\b(?:ama|fakat|lakin|ancak|yaln[ıi]z|haric[iı](?:nde)?|hari[cç]|ve|ayr[ıi]ca)\b"
+   )
+   ```
+   Commas are intentionally excluded from hard clause stops so coordinate noun lists remain bound to their shared predicate.
+
+2. **Predicate order evaluation:**
+   It compares the position of the first negative predicate (`yok`, `yoktur`, `değil`, `değişmedi`, `bulunmuyor`) against the first affirmative predicate (`var`, `vardır`, `mevcut`, `bulunuyor`). If the negative predicate appears first, the clause is classified as negated.
+
+3. **Pre-nominal privative checking:**
+   It checks a backward 25-character window within the same clause for privative modifiers (`hiçbir`, `asla`, `kesinlikle`).
+
+4. **Deterministic binary labels:**
    - `Temiz`: Device has no extracted hardware flaws or scam patterns.
    - `Kusurlu / İşlemli`: Device has reported physical damage, replaced components, or functional defects.
    - `Dolandırıcılık Riski`: Listing mentions suspicious transfer patterns (`kapora`, `havale sonrası kargo`, `yurtdışı`).
 
-### Hardware spec clustering (`MarketArbitrageEngine`)
+### 4. Hardware specification clustering (`MarketArbitrageEngine`)
 
 For smartphones and laptops, prices vary significantly by hardware variant. The engine extracts specifications via regular expressions before calculating medians:
 
